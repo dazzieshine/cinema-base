@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КиноБаза — Каталог Просмотров</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fa-solid fa-film"></i>
+                    <h2>КиноБаза</h2>
+                </div>
+
+                <!-- Навигация -->
+                <!-- Весь сайт построен по принципу SPA, чтобы не множить кучу страниц -->
+                <nav class="main-nav">
+                    <button class="nav-link active" data-target="catalogView">
+                        <i class="fa-solid fa-border-all"></i> Каталог
+                    </button>
+
+                    <button class="nav-link" data-target="statsView">
+                        <i class="fa-solid fa-chart-pie"></i> Статистика
+                    </button>
+                </nav>
+            </div>
+
+            <div class="header-right">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск по названию...">
+                </div>
+
+                <button id="openModalBtn" class="primary-btn">
+                    <i class="fa-solid fa-plus"></i> Добавить
+                </button>
+            </div>
+        </header>
+
+        <!-- Каталог -->
+        <section id="catalogView" class="view-section active">
+            <main class="workspace full-width">
+                <section class="content-area">
+                    <div class="filter-bar">
+                        <div class="filter-group">
+
+                            <!-- Куча всяких жанров -->
+                            <select id="filterGenre">
+                                <option value="all">Все жанры</option>
+                                <option value="Анимация">Анимация</option>
+                                <option value="Байопик">Байопик</option>
+                                <option value="Боевик">Боевик</option>
+                                <option value="Детектив">Детектив</option>
+                                <option value="Драма">Драма</option>
+                                <option value="Документальный">Документальный</option>
+                                <option value="Исторический">Исторический</option>
+                                <option value="Комедия">Комедия</option>
+                                <option value="Мелодрама">Мелодрама</option>
+                                <option value="Мюзикл">Мюзикл</option>
+                                <option value="Приключения">Приключения</option>
+                                <option value="Триллер">Триллер</option>
+                                <option value="Ужасы">Ужасы</option>
+                                <option value="Фантастика">Фантастика</option>
+                                <option value="Фэнтези">Фэнтези</option>
+                            </select>
+
+                            <!-- Статусы! -->
+                            <select id="filterStatus">
+                                <option value="all">Все статусы</option>
+                                <option value="watched">Просмотрено</option>
+                                <option value="plan">В планах</option>
+                            </select>
+                        </div>
+
+                        <!-- Сортировка -->
+                        <div class="sort-group">
+                            <label for="sortBy">Сортировка</label>
+                            <select id="sortBy">
+                                <option value="dateAdded">По дате добавления</option>
+                                <option value="title">По названию</option>
+                                <option value="year">По году выпуска</option>
+                                <option value="rating">По рейтингу</option>
+                            </select>
+                            <button type="button" id="sortOrderBtn" class="sort-order-btn" data-tooltip="Порядок: по убыванию">
+                                <i class="fa-solid fa-arrow-down-z-a" id="sortOrderIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="moviesGrid" class="movies-grid">
+                        <!-- Карточки фильмов будем рендерить в JS -->
+                    </div>
+                </section>
+            </main>
+        </section>
+
+        <!-- Статистика -->
+        <section id="statsView" class="view-section">
+            <div class="stats-dashboard">
+                <h3><i class="fa-solid fa-chart-pie"></i> Общая статистика просмотров</h3>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-clapperboard"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statTotal">0</span>
+                            <span class="stat-label">Всего фильмов в базе</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon watched"><i class="fa-solid fa-check"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statWatched">0</span>
+                            <span class="stat-label">Просмотрено</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon plan"><i class="fa-solid fa-bookmark"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statPlan">0</span>
+                            <span class="stat-label">В планах</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon hours"><i class="fa-solid fa-clock"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statHours">0 ч</span>
+                            <span class="stat-label">Общее время просмотра</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="top-genres-container">
+                    <h4>Топ жанров по количеству фильмов</h4>
+                    <div id="genreStatsList" class="genre-stats-list">
+                        <!-- Также заполняем динамически через JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Модалка -->
+        <div id="movieModal" class="modal-overlay">
+            <div class="modal-content wide-modal">
+                <div class="modal-header">
+                    <h3 id="formTitle">Добавить</h3>
+                    <button id="closeModalBtn" class="close-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <form id="movieForm" novalidate>
+                    <div class="modal-top-grid">
+                        <div class="modal-main-fields">
+                            <div class="input-group">
+                                <label for="typeSelect">Тип</label>
+                                <select id="typeSelect">
+                                    <option value="movie">Фильм</option>
+                                    <option value="tv">Сериал</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="titleInput" id="titleLabel">Название фильма</label>
+                                <input type="text" id="titleInput" placeholder="Например: Начало">
+                                <span class="error-msg" id="titleError">От 2 до 200 символов</span>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="posterInput">Ссылка на обложку</label>
+                                <input type="url" id="posterInput" placeholder="https://...">
+                            </div>
+                        </div>
+
+                        <!-- Превью обложки -->
+                        <div class="poster-preview-box">
+                            <span class="field-label">Обложка</span>
+                            <div class="preview-container">
+                                <img id="posterPreviewImg" src="" alt="Превью" style="display: none;">
+                                <div id="posterPlaceholderText" class="preview-placeholder">
+                                    <i class="fa-solid fa-image"></i>
+                                    <span>Нет картинки</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="yearInput">Год выпуска</label>
+                            <input type="number" id="yearInput" placeholder="2024">
+                            <!-- Первый в истории фильм («Сцена в саду Раундхэй») 
+                            был снят 14 октября 1888 года французским изобретателем Луи Лепренсем.
+                            Поэтому не от 1900, пасхалочка -->
+                            <span class="error-msg" id="yearError">От 1888 до текущего</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="durationInput" id="durationLabel">Длительность (мин)</label>
+                            <input type="number" id="durationInput" placeholder="120">
+                        </div>
+                    </div>
+
+                    <div class="input-row tv-only-fields" id="tvFields" style="display: none;">
+                        <div class="input-group">
+                            <label for="seasonInput">Сезон</label>
+                            <input type="number" id="seasonInput" min="1" placeholder="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="episodeInput">Количество серий</label>
+                            <input type="number" id="episodeInput" min="1" placeholder="1">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <span class="field-label">Жанры</span>
+                            <div class="genre-selector-container">
+                                <select id="genreSelectHelper">
+                                    <option value="" disabled selected>Выберите жанр...</option>
+                                    <option value="Анимация">Анимация</option>
+                                    <option value="Байопик">Байопик</option>
+                                    <option value="Боевик">Боевик</option>
+                                    <option value="Детектив">Детектив</option>
+                                    <option value="Драма">Драма</option>
+                                    <option value="Документальный">Документальный</option>
+                                    <option value="Исторический">Исторический</option>
+                                    <option value="Комедия">Комедия</option>
+                                    <option value="Мелодрама">Мелодрама</option>
+                                    <option value="Мюзикл">Мюзикл</option>
+                                    <option value="Приключения">Приключения</option>
+                                    <option value="Триллер">Триллер</option>
+                                    <option value="Ужасы">Ужасы</option>
+                                    <option value="Фантастика">Фантастика</option>
+                                    <option value="Фэнтези">Фэнтези</option>
+                                    <option value="Другое">Другое</option>
+                                </select>
+                                <!-- Контейнер для выбранных тегов -->
+                                <div class="selected-genres-tags" id="selectedGenresContainer"></div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="statusSelect">Статус</label>
+                            <select id="statusSelect">
+                                <option value="watched">Просмотрено</option>
+                                <option value="plan">В планах</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <span class="field-label">Рейтинг (1-10)</span>
+                        <input type="hidden" id="ratingInput" value="">
+                        <div class="star-rating-picker" id="starPicker">
+                            <i class="fa-regular fa-star" data-value="1"></i>
+                            <i class="fa-regular fa-star" data-value="2"></i>
+                            <i class="fa-regular fa-star" data-value="3"></i>
+                            <i class="fa-regular fa-star" data-value="4"></i>
+                            <i class="fa-regular fa-star" data-value="5"></i>
+                            <i class="fa-regular fa-star" data-value="6"></i>
+                            <i class="fa-regular fa-star" data-value="7"></i>
+                            <i class="fa-regular fa-star" data-value="8"></i>
+                            <i class="fa-regular fa-star" data-value="9"></i>
+                            <i class="fa-regular fa-star" data-value="10"></i>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="synopsisInput">Синопсис (описание)</label>
+                        <textarea id="synopsisInput" placeholder="Краткий сюжет..."></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="reviewInput">Ваш отзыв</label>
+                        <textarea id="reviewInput" placeholder="Ваши впечатления..."></textarea>
+                    </div>
+
+                    <div class="links-section">
+                        <span class="section-label">Ссылки на сервисы (необязательно)</span>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="kinopoiskInput">Кинопоиск</label>
+                                <input type="url" id="kinopoiskInput" placeholder="https://www.kinopoisk.ru/...">
+                            </div>
+                            <div class="input-group">
+                                <label for="imdbInput">IMDb</label>
+                                <input type="url" id="imdbInput" placeholder="https://www.imdb.com/...">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="letterboxdInput">Letterboxd</label>
+                                <input type="url" id="letterboxdInput" placeholder="https://letterboxd.com/...">
+                            </div>
+                            <div class="input-group">
+                                <label for="rottenTomatoesInput">Rotten Tomatoes</label>
+                                <input type="url" id="rottenTomatoesInput" placeholder="https://www.rottentomatoes.com/...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="saveBtn" disabled>Сохранить</button>
+                        <button type="button" id="resetBtn" class="reset-btn">Сброс</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p> Веб-Программирование, 5 семестр</p>
+            <p> Пугачев Данил Максимович, 3-ТИД-10</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
